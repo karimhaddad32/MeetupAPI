@@ -1,4 +1,5 @@
 using MeetupAPI.Entities;
+using MeetupAPI.Profilers;
 using MeetupAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,12 +20,14 @@ namespace MeetupAPI
             // Configure the HTTP request pipeline.
             SetupPipelineConfiguration(app);
         }
+
         private static void AddServices(WebApplicationBuilder builder)
         {
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddAutoMapper(typeof(AutoMapperProfiler));
 
             builder.Services.AddDbContext<MeetupContext>( options => {
                     options.UseSqlServer(builder.Configuration.GetConnectionString("MeetupConnectionString"));
