@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MeetupAPI.DTOs
 {
-    public class MeetupDto
+    public class FullMeetupDto
     {
         [Required]
         [MinLength(3)]
@@ -12,5 +12,7 @@ namespace MeetupAPI.DTOs
         public string Organizer { get; set; }
         public DateTime Date { get; set; }
         public bool IsPrivate { get; set; }
+        public LocationDto Location { get; set; }   
+        public List<LectureDto> Lectures { get; set; }   
     }
 }

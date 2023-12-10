@@ -15,6 +15,9 @@ namespace MeetupAPI.Profilers
             CreateMap<Lecture, LectureDto>()
                 .ReverseMap();
 
+            CreateMap<Meetup, FullMeetupDto>()
+                .ReverseMap();
+
             CreateMap<Meetup, MeetupDto>()
                 .ReverseMap();
 

@@ -2,6 +2,8 @@ using MeetupAPI.Entities;
 using MeetupAPI.Profilers;
 using MeetupAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
+using NLog;
+using NLog.Web;
 
 namespace MeetupAPI
 {
@@ -9,6 +11,9 @@ namespace MeetupAPI
     {
         public static void Main(string[] args)
         {
+            var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+            logger.Debug("init main");
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -29,6 +34,9 @@ namespace MeetupAPI
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(AutoMapperProfiler));
 
+            builder.Logging.ClearProviders();
+            builder.Host.UseNLog();
+
             builder.Services.AddDbContext<MeetupContext>( options => {
                     options.UseSqlServer(builder.Configuration.GetConnectionString("MeetupConnectionString"));
                     options.EnableSensitiveDataLogging();
@@ -47,6 +55,8 @@ namespace MeetupAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseAuthorization();
 

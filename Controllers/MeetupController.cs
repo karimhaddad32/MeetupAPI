@@ -13,37 +13,77 @@ namespace MeetupAPI.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
-        public async Task<ActionResult<List<MeetupDto>>> Get()
+        public async Task<ActionResult<List<FullMeetupDto>>> Get()
         {
             var meetups = await _meetupRepository.GetAllMeetupsAsync();
 
             if (meetups == null) { return NotFound(meetups); }
 
-            var meetupDtos = _mapper.Map<List<MeetupDto>>(meetups);
+            var meetupDtos = _mapper.Map<List<FullMeetupDto>>(meetups);
 
             return Ok(meetupDtos);
         }
 
         [HttpGet("{name}")]
-        public async Task<ActionResult<MeetupDto>> Get(string name)
+        public async Task<ActionResult<FullMeetupDto>> Get(string name)
         {
             var meetup = await _meetupRepository.GetMeetupAsync(name);
 
             if (meetup == null) { return NotFound(meetup); }
 
-            var meetupDto = _mapper.Map<MeetupDto>(meetup);
+            var meetupDto = _mapper.Map<FullMeetupDto>(meetup);
 
             return Ok(meetupDto);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] MeetupDto meetupDto)
+        public async Task<ActionResult> Post([FromBody] FullMeetupDto meetupDto)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
+
+            if(await _meetupRepository.MeetupAlreadyExistsAsync(meetupDto.Name))
+            {
+                throw new ArgumentException("Meetup name is already taken");
+            }
 
             var meetupModel = _mapper.Map<Meetup>(meetupDto);
 
             await _meetupRepository.CreateNewMeetupAsync(meetupModel);
+
+            return Created($"api/meetup/{meetupModel.Name}", null);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> Put(string name, [FromBody] MeetupDto meetupDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!await _meetupRepository.MeetupAlreadyExistsAsync(name))
+            {
+                return NotFound(meetupDto);
+            }
+
+            if (await _meetupRepository.MeetupAlreadyExistsAsync(meetupDto.Name))
+            {
+                throw new ArgumentException("Meetup name is already taken");
+            }
+
+            var newModel = _mapper.Map<Meetup>(meetupDto);
+
+            await _meetupRepository.UpdateMeetupAsync(name, newModel);
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> Delete(string name)
+        {
+            if (!await _meetupRepository.MeetupAlreadyExistsAsync(name))
+            {
+                return NotFound(name);
+            }
+
+            await _meetupRepository.DeleteMeetupAsync(name);
 
             return Ok();
         }
