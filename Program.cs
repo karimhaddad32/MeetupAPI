@@ -2,6 +2,7 @@ using MeetupAPI.Entities;
 using MeetupAPI.Profilers;
 using MeetupAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 
@@ -31,7 +32,10 @@ namespace MeetupAPI
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo() { Title = "MeetupAPI", Version = "1" });         
+            });
+
             builder.Services.AddAutoMapper(typeof(AutoMapperProfiler));
 
             builder.Logging.ClearProviders();
@@ -55,8 +59,6 @@ namespace MeetupAPI
             }
 
             app.UseHttpsRedirection();
-
-            app.UseStaticFiles();
 
             app.UseAuthorization();
 

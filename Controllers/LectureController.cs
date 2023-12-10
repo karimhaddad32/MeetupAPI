@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace MeetupAPI.Controllers
 {
     [Route("api/meetup/{meetupName}/lecture")]
-    public class LectureController(IMeetupRepository meetupRepository, IMapper mapper) : ControllerBase
+    public class LectureController(IMeetupRepository meetupRepository, IMapper mapper, ILogger<LectureController> logger) : ControllerBase
     {
         IMeetupRepository _meetupRepository = meetupRepository;
         IMapper _mapper = mapper;
+        ILogger<LectureController> _logger = logger;
 
         [HttpPost]
         public async Task<ActionResult> Post(string meetupName, [FromBody] LectureDto lectureDto)
@@ -50,6 +51,8 @@ namespace MeetupAPI.Controllers
             {
                 return NotFound();
             }
+
+            _logger.LogWarning($"Lectures for meetup {meetupName} were deleted!");
 
             await _meetupRepository.DeleteLecturesAsync(meetupName);
 
