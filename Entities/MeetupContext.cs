@@ -7,6 +7,8 @@ namespace MeetupAPI.Entities
         public DbSet<Meetup> Meetups { get; set;}
         public DbSet<Location> Locations { get; set;}
         public DbSet<Lecture> Lectures { get; set;}
+        public DbSet<Role> Roles { get; set;}
+        public DbSet<User> Users { get; set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
