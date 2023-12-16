@@ -37,7 +37,6 @@ namespace MeetupAPI
 
         private static void AddServices(WebApplicationBuilder builder)
         {
-            SetupJwtAuthenticationService(builder);
 
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
@@ -51,6 +50,8 @@ namespace MeetupAPI
             {
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "MeetupAPI", Version = "1" });
             });
+
+            SetupJwtAuthenticationService(builder);
 
             builder.Services.AddAutoMapper(typeof(AutoMapperProfiler));
 
@@ -95,6 +96,8 @@ namespace MeetupAPI
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.JwtKey)),
                 };
             });
+
+            builder.Services.AddScoped<IJwtProvider, JwtProvider>();
         }
 
         private static void SetupPipelineConfiguration(WebApplication app)

@@ -115,5 +115,12 @@ namespace MeetupAPI.Repositories
         {
             return _dbContext.Users.Any(x => x.Email.ToLower() == email.ToLower());
         }
+
+        public async Task<User?> GetUserAsync(string email)
+        {
+            return await _dbContext.Users.AsNoTracking()
+                .Include(x => x.Role)
+                .SingleOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
+        }
     }
 }

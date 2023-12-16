@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace MeetupAPI.DTOs
+﻿namespace MeetupAPI.DTOs
 {
     public class RegisterUserDto
     {

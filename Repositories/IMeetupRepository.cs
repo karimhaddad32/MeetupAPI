@@ -17,5 +17,6 @@ namespace MeetupAPI.Repositories
         Task<bool> MeetupAlreadyExistsAsync(string name);
         Task UpdateMeetupAsync(string name, Meetup newModel);
         bool UserAlreadyExists(string email);
+        Task<User?> GetUserAsync(string email);
     }
 }
