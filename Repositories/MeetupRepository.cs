@@ -104,5 +104,16 @@ namespace MeetupAPI.Repositories
             _dbContext.Update(model);
             _dbContext.SaveChanges();
         }
+
+        public async Task AddNewUserAsync(User user)
+        {
+            await _dbContext.Users.AddAsync(user);
+            _dbContext.SaveChanges();
+        }   
+        
+        public bool UserAlreadyExists(string email)
+        {
+            return _dbContext.Users.Any(x => x.Email.ToLower() == email.ToLower());
+        }
     }
 }
