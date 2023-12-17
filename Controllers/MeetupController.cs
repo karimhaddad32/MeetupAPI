@@ -2,17 +2,20 @@
 using MeetupAPI.DTOs;
 using MeetupAPI.Entities;
 using MeetupAPI.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetupAPI.Controllers
 {
     [Route("api/meetup")]
+    [Authorize]
     public class MeetupController(IMeetupRepository meetupRepository, IMapper mapper) : Controller
     {
         private readonly IMeetupRepository _meetupRepository = meetupRepository;
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<List<FullMeetupDto>>> Get()
         {
             var meetups = await _meetupRepository.GetAllMeetupsAsync();
@@ -25,6 +28,7 @@ namespace MeetupAPI.Controllers
         }
 
         [HttpGet("{name}")]
+        [Authorize(Policy = "HasNationality")]
         public async Task<ActionResult<FullMeetupDto>> Get(string name)
         {
             var meetup = await _meetupRepository.GetMeetupAsync(name);
@@ -37,6 +41,7 @@ namespace MeetupAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Moderator")]
         public async Task<ActionResult> Post([FromBody] FullMeetupDto meetupDto)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
