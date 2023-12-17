@@ -72,10 +72,8 @@ namespace MeetupAPI.Repositories
             }
         } 
         
-        public async Task DeleteMeetupAsync(string name)
+        public async Task DeleteMeetupAsync(Meetup meetup)
         {
-            var meetup = await _dbContext.Meetups.SingleAsync(x => x.Name == name);
-
             _dbContext.Meetups.Remove(meetup);
             _dbContext.SaveChanges();
         }

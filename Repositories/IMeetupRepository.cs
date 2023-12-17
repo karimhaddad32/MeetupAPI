@@ -10,7 +10,7 @@ namespace MeetupAPI.Repositories
         Task CreateNewMeetupAsync(Meetup meetupModel);
         Task DeleteLectureAsync(string meetupName, int lectureId);
         Task DeleteLecturesAsync(string meetupName);
-        Task DeleteMeetupAsync(string name);
+        Task DeleteMeetupAsync(Meetup meetup);
         Task<List<Meetup>> GetAllMeetupsAsync();
         Task<List<Lecture>> GetLecturesAsync(string meetupName);
         Task<Meetup?> GetMeetupAsync(string name);

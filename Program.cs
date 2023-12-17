@@ -107,6 +107,7 @@ namespace MeetupAPI
 
 
             builder.Services.AddScoped<IAuthorizationHandler, MinimumAgeHandler>();
+            builder.Services.AddScoped<IAuthorizationHandler, MeetupResourceOperationHandler>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
         }
 

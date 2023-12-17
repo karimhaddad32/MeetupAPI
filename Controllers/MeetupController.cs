@@ -1,18 +1,22 @@
 ﻿using AutoMapper;
+using MeetupAPI.Authorization;
 using MeetupAPI.DTOs;
 using MeetupAPI.Entities;
 using MeetupAPI.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace MeetupAPI.Controllers
 {
     [Route("api/meetup")]
     [Authorize]
-    public class MeetupController(IMeetupRepository meetupRepository, IMapper mapper) : Controller
+    public class MeetupController(IMeetupRepository meetupRepository, IMapper mapper, IAuthorizationService authorizationService) : Controller
     {
         private readonly IMeetupRepository _meetupRepository = meetupRepository;
         private readonly IMapper _mapper = mapper;
+        private readonly IAuthorizationService _authorizationService = authorizationService;
 
         [HttpGet]
         [AllowAnonymous]
@@ -45,21 +49,25 @@ namespace MeetupAPI.Controllers
         [Authorize(Roles = "Admin,Moderator")]
         public async Task<ActionResult> Post([FromBody] FullMeetupDto meetupDto)
         {
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if(await _meetupRepository.MeetupAlreadyExistsAsync(meetupDto.Name))
+            if (await _meetupRepository.MeetupAlreadyExistsAsync(meetupDto.Name))
             {
                 throw new ArgumentException("Meetup name is already taken");
             }
 
             var meetupModel = _mapper.Map<Meetup>(meetupDto);
 
+            var userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            meetupModel.CreatedById = int.Parse(userId);
+
             await _meetupRepository.CreateNewMeetupAsync(meetupModel);
 
             return Created($"api/meetup/{meetupModel.Name}", null);
         }
 
-        [HttpPut]
+        [HttpPut("{name}")]
         public async Task<ActionResult> Put(string name, [FromBody] MeetupDto meetupDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -71,10 +79,14 @@ namespace MeetupAPI.Controllers
 
             if (await _meetupRepository.MeetupAlreadyExistsAsync(meetupDto.Name))
             {
-                throw new ArgumentException("Meetup name is already taken");
+                return BadRequest("Name is Already Taken");
             }
 
             var newModel = _mapper.Map<Meetup>(meetupDto);
+
+            var authorizationResult = _authorizationService.AuthorizeAsync(User, newModel, new ResourceOperationRequirement(OperationType.Update)).Result;
+
+            if(!authorizationResult.Succeeded) { return Forbid(); }
 
             await _meetupRepository.UpdateMeetupAsync(name, newModel);
 
@@ -89,7 +101,13 @@ namespace MeetupAPI.Controllers
                 return NotFound(name);
             }
 
-            await _meetupRepository.DeleteMeetupAsync(name);
+            var meetup = await _meetupRepository.GetMeetupAsync(name);
+
+            var authorizationResult = _authorizationService.AuthorizeAsync(User, meetup, new ResourceOperationRequirement(OperationType.Delete)).Result;
+
+            if (!authorizationResult.Succeeded) { return Forbid();}
+
+            await _meetupRepository.DeleteMeetupAsync(meetup);
 
             return Ok();
         }

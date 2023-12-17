@@ -11,5 +11,7 @@
         public virtual Location Location { get; set; }
 
         public virtual ICollection<Lecture> Lectures { get; set; }
+        public int? CreatedById { get; set; }
+        public User CreatedBy { get; set; }
     }
 }
