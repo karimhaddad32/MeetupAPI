@@ -4,6 +4,6 @@
     {
         public string JwtKey { get; set; }
         public string JwtIssuer { get; set; }
-        public int JwtExpireDay { get; set; }
+        public int JwtExpireDays { get; set; }
     }
 }

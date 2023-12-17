@@ -13,6 +13,6 @@ namespace MeetupAPI.DTOs
         public DateTime Date { get; set; }
         public bool IsPrivate { get; set; }
         public LocationDto Location { get; set; }   
-        public List<LectureDto> Lectures { get; set; }   
+        public List<LectureDto> Lectures { get; set; }
     }
 }

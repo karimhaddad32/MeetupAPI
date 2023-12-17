@@ -16,7 +16,9 @@ namespace MeetupAPI.Profilers
                 .ReverseMap();
 
             CreateMap<Meetup, FullMeetupDto>()
-                .ReverseMap();
+                .ReverseMap()
+                .ForMember(model => model.CreatedBy, config => config.Ignore())
+                .ForMember(model => model.CreatedById, config => config.Ignore());
 
             CreateMap<Meetup, MeetupDto>()
                 .ReverseMap();

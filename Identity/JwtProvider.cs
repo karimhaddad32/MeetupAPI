@@ -32,7 +32,7 @@ namespace MeetupAPI.Identity
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.JwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expires = DateTime.UtcNow.AddDays(_jwtOptions.JwtExpireDay);
+            var expires = DateTime.UtcNow.AddDays(_jwtOptions.JwtExpireDays);
 
             var token = new JwtSecurityToken(
                 _jwtOptions.JwtIssuer,

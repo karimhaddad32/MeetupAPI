@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
+using MeetupAPI.ActionFilters;
 using MeetupAPI.Authorization;
 using MeetupAPI.DTOs;
 using MeetupAPI.Entities;
 using MeetupAPI.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace MeetupAPI.Controllers
 {
-    [Route("api/meetup")]
+    [Route("api/meetup")]   
     [Authorize]
+    [TimeTrackFilter]
     public class MeetupController(IMeetupRepository meetupRepository, IMapper mapper, IAuthorizationService authorizationService) : Controller
     {
         private readonly IMeetupRepository _meetupRepository = meetupRepository;
@@ -47,7 +48,7 @@ namespace MeetupAPI.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin,Moderator")]
-        public async Task<ActionResult> Post([FromBody] FullMeetupDto meetupDto)
+        public async Task<ActionResult> Post([FromBody] MeetupDto meetupDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -68,7 +69,7 @@ namespace MeetupAPI.Controllers
         }
 
         [HttpPut("{name}")]
-        public async Task<ActionResult> Put(string name, [FromBody] MeetupDto meetupDto)
+        public async Task<ActionResult> Put(string name, [FromBody] FullMeetupDto meetupDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -93,7 +94,7 @@ namespace MeetupAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("{name}")]
         public async Task<ActionResult> Delete(string name)
         {
             if (!await _meetupRepository.MeetupAlreadyExistsAsync(name))

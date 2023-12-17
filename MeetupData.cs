@@ -4,22 +4,23 @@ namespace MeetupAPI
 {
     public static class MeetupData 
     {
-
         public static readonly List<Meetup> MockMeetUps =
         [
-            new() {
+            new Meetup() {
                 Id = 1,
                 Name = "Tech Meetup",
                 Organizer = "John Doe",
                 Date = DateTime.Now.AddDays(7),
                 IsPrivate = false,
+                CreatedById = 1
             },
             new() {
                 Id = 2,
                 Name = "Data Science Forum",
                 Organizer = "Alice Johnson",
                 Date = DateTime.Now.AddDays(14),
-                IsPrivate = true
+                IsPrivate = true,
+                CreatedById = 2
             }
         ];
 
