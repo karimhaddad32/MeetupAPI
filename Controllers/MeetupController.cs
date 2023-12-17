@@ -29,6 +29,7 @@ namespace MeetupAPI.Controllers
 
         [HttpGet("{name}")]
         [Authorize(Policy = "HasNationality")]
+        [Authorize(Policy = "AtLeast18")]
         public async Task<ActionResult<FullMeetupDto>> Get(string name)
         {
             var meetup = await _meetupRepository.GetMeetupAsync(name);
