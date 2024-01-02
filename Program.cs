@@ -40,10 +40,8 @@ namespace MeetupAPI
 
         private static void AddServices(WebApplicationBuilder builder)
         {
-
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-            builder.Services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)));
 
             SetupFluentValidationService(builder);
 
@@ -55,6 +53,8 @@ namespace MeetupAPI
             });
 
             SetupJwtAuthenticationService(builder);
+
+            builder.Services.AddScoped<TimeTrackFilter>();
 
             builder.Services.AddAutoMapper(typeof(AutoMapperProfiler));
 
@@ -69,6 +69,15 @@ namespace MeetupAPI
             );
 
             builder.Services.AddScoped<IMeetupRepository, MeetupRepository>();
+
+            builder.Services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)));
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontEndClient", 
+                    builder => builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
+
+            });
         }
 
         private static void SetupFluentValidationService(WebApplicationBuilder builder)
@@ -114,6 +123,9 @@ namespace MeetupAPI
 
         private static void SetupPipelineConfiguration(WebApplication app)
         {
+            app.UseResponseCaching();
+            app.UseStaticFiles();
+            app.UseCors("FrontEndClient");
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -130,6 +142,5 @@ namespace MeetupAPI
 
             app.Run();
         }
-
     }
 }

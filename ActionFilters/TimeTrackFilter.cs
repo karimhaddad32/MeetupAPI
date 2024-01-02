@@ -3,8 +3,9 @@ using System.Diagnostics;
 
 namespace MeetupAPI.ActionFilters
 {
-    public class TimeTrackFilter : Attribute, IActionFilter
+    public class TimeTrackFilter(ILogger<TimeTrackFilter> logger) : IActionFilter
     {
+        private readonly ILogger<TimeTrackFilter> _logger = logger;
         private Stopwatch _stopWatch;
 
         public void OnActionExecuted(ActionExecutedContext context)
@@ -14,7 +15,7 @@ namespace MeetupAPI.ActionFilters
             var milliseconds = _stopWatch.ElapsedMilliseconds;
             var action = context.ActionDescriptor.DisplayName;
 
-            Debug.WriteLine($"Action: {action}, executed in {milliseconds} milliseconds.");
+            _logger.LogInformation($"Action: {action}, executed in {milliseconds} milliseconds.");
         }
 
         public void OnActionExecuting(ActionExecutingContext context)

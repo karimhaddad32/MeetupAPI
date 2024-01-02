@@ -12,7 +12,7 @@ namespace MeetupAPI.Controllers
 {
     [Route("api/meetup")]   
     [Authorize]
-    [TimeTrackFilter]
+    [ServiceFilter<TimeTrackFilter>]
     public class MeetupController(IMeetupRepository meetupRepository, IMapper mapper, IAuthorizationService authorizationService) : Controller
     {
         private readonly IMeetupRepository _meetupRepository = meetupRepository;
@@ -20,7 +20,7 @@ namespace MeetupAPI.Controllers
         private readonly IAuthorizationService _authorizationService = authorizationService;
 
         [HttpGet]
-        [AllowAnonymous]
+        [NationalityFilter("German, Russian")]
         public async Task<ActionResult<List<FullMeetupDto>>> Get()
         {
             var meetups = await _meetupRepository.GetAllMeetupsAsync();
@@ -35,6 +35,7 @@ namespace MeetupAPI.Controllers
         [HttpGet("{name}")]
         [Authorize(Policy = "HasNationality")]
         [Authorize(Policy = "AtLeast18")]
+        [NationalityFilter("English,German")]
         public async Task<ActionResult<FullMeetupDto>> Get(string name)
         {
             var meetup = await _meetupRepository.GetMeetupAsync(name);
@@ -59,7 +60,9 @@ namespace MeetupAPI.Controllers
 
             var meetupModel = _mapper.Map<Meetup>(meetupDto);
 
-            var userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if(userId == null) { return Forbid(); }
 
             meetupModel.CreatedById = int.Parse(userId);
 

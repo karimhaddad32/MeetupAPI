@@ -12,13 +12,12 @@ namespace MeetupAPI.Authorization
                 context.Succeed(requirement);        
             }
 
-            var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            if(resource.CreatedById == int.Parse(userId))
+            if(userId != null && resource.CreatedById == int.Parse(userId))
             {
                 context.Succeed(requirement);
             }
-
 
             return Task.CompletedTask;
         }

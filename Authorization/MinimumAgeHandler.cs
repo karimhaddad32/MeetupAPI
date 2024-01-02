@@ -9,19 +9,19 @@ namespace MeetupAPI.Authorization
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumAgeRequirement requirement)
         {
-            var userEmail = context.User.FindFirst(c => c.Type == ClaimTypes.Name).Value;
-            var dateOfBirth = DateTime.Parse(context.User.FindFirst(c => c.Type == "DateOfBirth").Value);
+            var userEmail = context.User.FindFirst(c => c.Type == ClaimTypes.Name)?.Value;
+            bool dateProvided = DateTime.TryParse(context.User.FindFirst(c => c.Type == "DateOfBirth")?.Value, out DateTime dateOfBirth);
 
             _logger.LogInformation($"Handling minimum age requirement for: {userEmail}. [DateOfBirth: {dateOfBirth}]");
 
-            if(dateOfBirth.AddYears(requirement.MinimumAge) <= DateTime.Today) {
+            if (dateOfBirth.AddYears(requirement.MinimumAge) > DateTime.Today || userEmail == null || !dateProvided) {
 
-                _logger.LogInformation($"Access Granted");
-                context.Succeed(requirement);
+                _logger.LogInformation($"Access Denied!");
             }
             else
             {
-                _logger.LogInformation($"Access Denied!");
+                _logger.LogInformation($"Access Granted");
+                context.Succeed(requirement);
             }
 
             return Task.CompletedTask;
