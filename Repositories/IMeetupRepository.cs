@@ -1,4 +1,5 @@
-﻿using MeetupAPI.Entities;
+﻿using MeetupAPI.Controllers;
+using MeetupAPI.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetupAPI.Repositories
@@ -11,7 +12,7 @@ namespace MeetupAPI.Repositories
         Task DeleteLectureAsync(string meetupName, int lectureId);
         Task DeleteLecturesAsync(string meetupName);
         Task DeleteMeetupAsync(Meetup meetup);
-        Task<List<Meetup>> GetAllMeetupsAsync();
+        Task<(List<Meetup>, int)> GetAllMeetupsAsync(MeetupQuery query);
         Task<List<Lecture>> GetLecturesAsync(string meetupName);
         Task<Meetup?> GetMeetupAsync(string name);
         Task<bool> MeetupAlreadyExistsAsync(string name);

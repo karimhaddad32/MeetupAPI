@@ -20,16 +20,18 @@ namespace MeetupAPI.Controllers
         private readonly IAuthorizationService _authorizationService = authorizationService;
 
         [HttpGet]
-        [NationalityFilter("German, Russian")]
-        public async Task<ActionResult<List<FullMeetupDto>>> Get()
+        [AllowAnonymous()]
+        public async Task<ActionResult<PagedResult<FullMeetupDto>>> GetAll([FromQuery] MeetupQuery query)
         {
-            var meetups = await _meetupRepository.GetAllMeetupsAsync();
+            var (meetups, totalCount) = await _meetupRepository.GetAllMeetupsAsync(query);
 
             if (meetups == null) { return NotFound(meetups); }
 
             var meetupDtos = _mapper.Map<List<FullMeetupDto>>(meetups);
 
-            return Ok(meetupDtos);
+            var result = new PagedResult<FullMeetupDto>(meetupDtos, totalCount, query.PageNumber, query.PageSize);
+
+            return Ok(result);
         }
 
         [HttpGet("{name}")]

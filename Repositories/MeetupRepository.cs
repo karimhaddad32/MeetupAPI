@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Features;
+using MeetupAPI.Controllers;
 using MeetupAPI.DTOs;
 using MeetupAPI.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -10,14 +11,23 @@ namespace MeetupAPI.Repositories
     {
         private readonly MeetupContext _dbContext = dbContext;
 
-        public async Task<List<Meetup>> GetAllMeetupsAsync()
+        public async Task<(List<Meetup>, int)> GetAllMeetupsAsync(MeetupQuery query)
         {
-            var meetups = await _dbContext.Meetups.AsNoTracking()
+            var baseQuery = _dbContext.Meetups.AsNoTracking()
                 .Include(x => x.Location)
                 .Include(x => x.Lectures)
+                .Where(x => query.SearchPhrase == null ||
+                            x.Organizer.ToLower().Contains(query.SearchPhrase, StringComparison.OrdinalIgnoreCase) ||
+                            x.Name.ToLower().Contains(query.SearchPhrase, StringComparison.OrdinalIgnoreCase));
+
+            var meetups = await baseQuery
+                .Skip(query.PageSize * (query.PageNumber - 1))
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return meetups;
+            var totalCount = baseQuery.Count();
+
+            return (meetups, totalCount);
         }
 
         public async Task<List<Lecture>> GetLecturesAsync(string meetupName)
