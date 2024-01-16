@@ -17,8 +17,8 @@ namespace MeetupAPI.Repositories
                 .Include(x => x.Location)
                 .Include(x => x.Lectures)
                 .Where(x => query.SearchPhrase == null ||
-                            x.Organizer.ToLower().Contains(query.SearchPhrase, StringComparison.OrdinalIgnoreCase) ||
-                            x.Name.ToLower().Contains(query.SearchPhrase, StringComparison.OrdinalIgnoreCase));
+                            x.Organizer.ToLower().Contains(query.SearchPhrase.ToLower()) ||
+                            x.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
 
             var meetups = await baseQuery
                 .Skip(query.PageSize * (query.PageNumber - 1))

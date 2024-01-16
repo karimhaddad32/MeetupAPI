@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using MeetupAPI.ActionFilters;
 using MeetupAPI.Authorization;
+using MeetupAPI.Controllers;
 using MeetupAPI.DTOs;
 using MeetupAPI.Entities;
 using MeetupAPI.Identity;
@@ -84,6 +85,7 @@ namespace MeetupAPI
         {
             builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserValidator>();
+            builder.Services.AddScoped<IValidator<MeetupQuery>, MeetupQueryValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
         }
 

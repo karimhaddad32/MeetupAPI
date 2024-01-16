@@ -20,9 +20,11 @@ namespace MeetupAPI.Controllers
         private readonly IAuthorizationService _authorizationService = authorizationService;
 
         [HttpGet]
-        [AllowAnonymous()]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<FullMeetupDto>>> GetAll([FromQuery] MeetupQuery query)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var (meetups, totalCount) = await _meetupRepository.GetAllMeetupsAsync(query);
 
             if (meetups == null) { return NotFound(meetups); }
