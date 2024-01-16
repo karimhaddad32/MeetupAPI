@@ -3,6 +3,7 @@ using MeetupAPI.Controllers;
 using MeetupAPI.DTOs;
 using MeetupAPI.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 
 namespace MeetupAPI.Repositories
@@ -19,6 +20,21 @@ namespace MeetupAPI.Repositories
                 .Where(x => query.SearchPhrase == null ||
                             x.Organizer.ToLower().Contains(query.SearchPhrase.ToLower()) ||
                             x.Name.ToLower().Contains(query.SearchPhrase.ToLower()));
+
+            if (!string.IsNullOrEmpty(query.SortBy))
+            {
+                var propertySelectors = new Dictionary<string, Expression<Func<Meetup, object>>>() {
+                    {nameof(Meetup.Name), meetup => meetup.Name},
+                    {nameof(Meetup.Date), meetup => meetup.Date},
+                    {nameof(Meetup.Organizer), meetup => meetup.Organizer},                    
+                };
+
+                var propertySelector = propertySelectors[query.SortBy];
+
+                baseQuery = query.SortDirection == SortDirection.ASC
+                    ? baseQuery.OrderBy(propertySelector)
+                    : baseQuery.OrderByDescending(propertySelector);                
+            }
 
             var meetups = await baseQuery
                 .Skip(query.PageSize * (query.PageNumber - 1))

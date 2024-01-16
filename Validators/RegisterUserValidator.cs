@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using MeetupAPI.DTOs;
-using MeetupAPI.Entities;
 using MeetupAPI.Repositories;
 
 namespace MeetupAPI.Validators

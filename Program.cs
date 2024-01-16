@@ -84,9 +84,12 @@ namespace MeetupAPI
         private static void SetupFluentValidationService(WebApplicationBuilder builder)
         {
             builder.Services.AddFluentValidationClientsideAdapters();
+            builder.Services.AddFluentValidationAutoValidation()
+                            .AddFluentValidationAutoValidation();
             builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserValidator>();
             builder.Services.AddScoped<IValidator<MeetupQuery>, MeetupQueryValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<MeetupQueryValidator>();
         }
 
         private static void SetupJwtAuthenticationService(WebApplicationBuilder builder)
@@ -139,7 +142,7 @@ namespace MeetupAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            
             app.MapControllers();
 
             app.Run();
